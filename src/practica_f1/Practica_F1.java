@@ -1,6 +1,8 @@
 
 package practica_f1;
 
+import vista.FrmPrincipal;
+
 /**
  *
  * @author alexg

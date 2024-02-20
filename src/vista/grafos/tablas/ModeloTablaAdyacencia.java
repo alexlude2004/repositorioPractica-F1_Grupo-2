@@ -28,7 +28,7 @@ public class ModeloTablaAdyacencia extends AbstractTableModel {
         if (columnIndex == 0) {
             return getGrafo().obtenerEtiqueta(rowIndex + 1).toString();
         } else {
-            String valor = "-**-";
+            String valor = "-***-";
             try {
                 Estacion o = getGrafo().obtenerEtiqueta(rowIndex + 1);
                 Estacion d = getGrafo().obtenerEtiqueta(columnIndex);

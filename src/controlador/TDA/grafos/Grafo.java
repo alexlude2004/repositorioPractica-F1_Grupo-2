@@ -57,75 +57,6 @@ public abstract class Grafo {
         return band;
     }
 
-    public HashMap camino(Integer o, Integer d) throws Exception {
-        HashMap sendero = new HashMap();
-        if (esta_conectado()) {
-            LinkedList<Integer> vertices = new LinkedList<>();
-            LinkedList<Double> pesos = new LinkedList<>();
-            Boolean finalizar = false;
-            Integer inicial = o;
-            vertices.add(inicial);
-            while (!finalizar) {
-                LinkedList<Adyacencia> adyacencias = adyacentes(inicial);
-                Double peso = Double.MAX_VALUE;
-                Integer T = -1;
-                for (int i = 0; i < adyacencias.getSize(); i++) {
-                    Adyacencia ad = adyacencias.get(i);
-                    if (!estaCamino(vertices, ad.getD())) {
-                        Double pesoArista = ad.getPeso();
-                        if (d.intValue() == ad.getD().intValue()) {
-                            T = ad.getD();
-                            peso = pesoArista;
-                            break;
-                        } else if (pesoArista < peso) {
-                            T = ad.getD();
-                            peso = pesoArista;
-                        }
-                    }
-                }
-                vertices.add(T);
-                pesos.add(peso);
-                inicial = T;
-                if (d.intValue() == inicial.intValue()) {
-                    break;
-                }
-            }
-            sendero.put("camino", vertices);
-            sendero.put("peso", pesos);
-        } else {
-            System.out.println("error en camino: ");
-        }
-
-        return sendero;
-    }
-
-//    public boolean conectadoAnchuraNoDir() throws Exception {
-//        Boolean[] visitados = obtenerVerticesNoVisitados();
-//        LinkedList<Integer> lista = new LinkedList<>();
-//        lista.add(1);
-//        visitados[1] = true;
-//        while (!lista.isEmpty()) {
-//            Integer actual = lista.deleteFirst();
-//            System.out.println("Actual: " + actual);
-//            Adyacencia[] adyacentes = adyacentes(actual).toArray();
-//            for (Adyacencia adyacencia : adyacentes) {
-//                Integer destino = adyacencia.getD();
-//                System.out.println("Destino de adyacencia: " + destino);
-//                if (visitados[destino] != null) {
-//                    if (!visitados[destino]) {
-//                        lista.add(destino);
-//                        visitados[destino] = true;
-//                    }
-//                }
-//            }
-//        }
-//        for (int i = 1; i <= nro_vertices(); i++) {
-//            if (!visitados[i]) {
-//                return false;
-//            }
-//        }
-//        return true;
-//    }
     private Boolean estaCamino(LinkedList<Integer> lista, Integer vertice) throws Exception {
         Boolean band = false;
         for (int i = 0; i < lista.getSize(); i++) {
@@ -137,50 +68,98 @@ public abstract class Grafo {
         return band;
     }
 
-// Algoritmo de Dijkstra
-//    public void dijkstra(int origen) {
-//        LinkedList<Integer> distancia = new LinkedList<>();
-//        LinkedList<Boolean> visitado = new LinkedList<>();
-//
-//        for (int i = 0; i < nro_vertices(); i++) {
-//            distancia.add(Integer.MAX_VALUE);
-//            visitado.add(false);
-//        }
-//
-//        distancia.set(origen, 0);
-//
-//        for (int i = 0; i < nro_vertices() - 1; i++) {
-//            int u = minDistancia(distancia, visitado);
-//            visitado.set(u, true);
-//
-//            for (int v = 0; v < nro_vertices(); v++) {
-//                if (!visitado.get(v) && adyacentes(u, v) != 0 && distancia.get(u) != Integer.MAX_VALUE && distancia.get(u) + adyacentes(u, v) < distancia.get(v)) {
-//                    distancia.set(v, distancia.get(u) + adyacentes(u, v));
-//                }
-//            }
-//        }
-//    }
-//
-//// Algoritmo de Floyd-Warshall
-//    public void floydWarshall() {
-//        LinkedList<LinkedList<Integer>> dist = new LinkedList<>();
-//
-//        for (int i = 0; i < nro_vertices(); i++) {
-//            LinkedList<Integer> temp = new LinkedList<>();
-//            for (int j = 0; j < nro_vertices(); j++) {
-//                temp.add(adyacentes(i, j));
-//            }
-//            dist.add(temp);
-//        }
-//
-//        for (int k = 0; k < nro_vertices(); k++) {
-//            for (int i = 0; i < nro_vertices(); i++) {
-//                for (int j = 0; j < nro_vertices(); j++) {
-//                    if (dist.get(i).get(k) + dist.get(k).get(j) < dist.get(i).get(j)) {
-//                        dist.get(i).set(j, dist.get(i).get(k) + dist.get(k).get(j));
-//                    }
-//                }
-//            }
-//        }
-//    }
+    public HashMap<String, Object> dijkstra(Integer o, Integer d) throws Exception {
+        HashMap<String, Object> sendero = new HashMap<>();
+        Integer V = nro_vertices();
+        Double[] distancia = new Double[V + 1];
+        Boolean[] visitado = new Boolean[V + 1];
+        HashMap<Integer, Integer> predecesores = new HashMap<>();
+
+        for (int i = 1; i <= V; i++) {
+            distancia[i] = Double.MAX_VALUE;
+            visitado[i] = false;
+        }
+
+        distancia[o] = 0.0;
+
+        for (int i = 1; i <= V - 1; i++) {
+            Double min = Double.MAX_VALUE;
+            Integer min_index = -1;
+
+            for (int v = 1; v <= V; v++) {
+                if (!visitado[v] && distancia[v] <= min) {
+                    min = distancia[v];
+                    min_index = v;
+                }
+            }
+            visitado[min_index] = true;
+
+            for (int j = 1; j <= V; j++) {
+                if (!visitado[j] && existe_arista(min_index, j) && distancia[min_index] != Double.MAX_VALUE
+                        && distancia[min_index] + peso_arista(min_index, j) < distancia[j]) {
+                    distancia[j] = distancia[min_index] + peso_arista(min_index, j);
+                    predecesores.put(j, min_index);
+                }
+            }
+        }
+
+        LinkedList<Integer> camino = new LinkedList<>();
+        Integer destinoActual = d;
+        while (destinoActual != null) {
+            camino.add(destinoActual);
+            destinoActual = predecesores.get(destinoActual);
+        }
+
+        sendero.put("camino", camino);
+        sendero.put("distancias", distancia);
+
+        return sendero;
+    }
+
+    public HashMap<String, Object> Floyd(Integer o, Integer d) throws Exception {
+        HashMap<String, Object> sendero = new HashMap<>();
+        Integer V = nro_vertices();
+        Double[][] distancias = new Double[V + 1][V + 1];
+        Integer[][] predecesores = new Integer[V + 1][V + 1];
+
+        for (int i = 1; i <= V; i++) {
+            for (int j = 1; j <= V; j++) {
+                if (i == j) {
+                    distancias[i][j] = 0.0;
+                } else if (existe_arista(i, j)) {
+                    distancias[i][j] = peso_arista(i, j);
+                    predecesores[i][j] = i;
+                } else {
+                    distancias[i][j] = Double.MAX_VALUE;
+                    predecesores[i][j] = null;
+                }
+            }
+        }
+
+        for (int k = 1; k <= V; k++) {
+            for (int i = 1; i <= V; i++) {
+                for (int j = 1; j <= V; j++) {
+                    if (distancias[i][k] != Double.MAX_VALUE && distancias[k][j] != Double.MAX_VALUE
+                            && distancias[i][k] + distancias[k][j] < distancias[i][j]) {
+                        distancias[i][j] = distancias[i][k] + distancias[k][j];
+                        predecesores[i][j] = predecesores[k][j];
+                    }
+                }
+            }
+        }
+
+        LinkedList<Integer> camino = new LinkedList<>();
+        Integer u = d;
+        while (u != o && predecesores[o][u] != null) {
+            camino.add(u);
+            u = predecesores[o][u];
+        }
+        camino.add(o);
+
+        sendero.put("camino", camino);
+        sendero.put("distancias", distancias);
+
+        return sendero;
+    }
+
 }
