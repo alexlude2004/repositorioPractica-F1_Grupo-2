@@ -122,19 +122,26 @@ public class FrmMapa extends javax.swing.JFrame {
             Integer posD = cbxDestino.getSelectedIndex() + 1;
             HashMap<String, Object> mapa = ed.getGrafoEstacion().dijkstra(posD, posO);
 
-            if (mapa.isEmpty()) {
-                JOptionPane.showMessageDialog(null, "No existe camino", "Error", JOptionPane.ERROR_MESSAGE);
-            } else {
-                LinkedList<Integer> caminos = (LinkedList<Integer>) mapa.get("camino");
-                StringBuilder caminoStr = new StringBuilder();
-                for (int i = 0; i < caminos.getSize(); i++) {
-                    Integer v = caminos.get(i);
-                    caminoStr.append(ed.getGrafoEstacion().obtenerEtiqueta(v)).append("  ----  ");
+            if (posD != posO) {
+                if (mapa.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "No existe camino", "Error", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    LinkedList<Integer> caminos = (LinkedList<Integer>) mapa.get("camino");
+                    StringBuilder caminoStr = new StringBuilder();
+                    for (int i = 0; i < caminos.getSize(); i++) {
+                        Integer v = caminos.get(i);
+                        caminoStr.append(ed.getGrafoEstacion().obtenerEtiqueta(v)).append("  ----  ");
+                    }
+                    String posicionOrigen = cbxOrigen.getSelectedItem().toString();
+                    String posicionDestino = cbxDestino.getSelectedItem().toString();
+                    String mensaje = "Punto de Origen: " + posicionOrigen + "\n" + "Punto de Destino: " + posicionDestino + "\n\nEl camino corto es: \n" + caminoStr.toString();
+                    JOptionPane.showMessageDialog(null, mensaje, "Algoritmo Dijkstra", JOptionPane.INFORMATION_MESSAGE);
                 }
-                String posicionOrigen = cbxOrigen.getSelectedItem().toString();
-                String posicionDestino = cbxDestino.getSelectedItem().toString();
-                String mensaje = "Punto de Origen: " + posicionOrigen + "\n" + "Punto de Destino: " + posicionDestino + "\n\nEl camino corto es: \n" + caminoStr.toString();
-                JOptionPane.showMessageDialog(null, mensaje, "Algoritmo Dijkstra", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null,
+                        "No se puede buscar el camino mas corto con la misma adyacencia",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);                
             }
         } else {
             JOptionPane.showMessageDialog(null, "Grafo nulo", "Error", JOptionPane.ERROR_MESSAGE);
@@ -147,19 +154,27 @@ public class FrmMapa extends javax.swing.JFrame {
             Integer posD = cbxDestino.getSelectedIndex() + 1;
             HashMap<String, Object> mapa = ed.getGrafoEstacion().Floyd(posD, posO);
 
-            if (mapa.isEmpty()) {
-                JOptionPane.showMessageDialog(null, "No existe camino", "Error", JOptionPane.ERROR_MESSAGE);
-            } else {
-                LinkedList<Integer> caminos = (LinkedList<Integer>) mapa.get("camino");
-                StringBuilder caminoStr = new StringBuilder();
-                for (int i = 0; i < caminos.getSize(); i++) {
-                    Integer v = caminos.get(i);
-                    caminoStr.append(ed.getGrafoEstacion().obtenerEtiqueta(v)).append("  ----  ");
+            if (posD != posO) {
+                if (mapa.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "No existe camino", "Error", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    LinkedList<Integer> caminos = (LinkedList<Integer>) mapa.get("camino");
+                    StringBuilder caminoStr = new StringBuilder();
+                    for (int i = 0; i < caminos.getSize(); i++) {
+                        Integer v = caminos.get(i);
+                        caminoStr.append(ed.getGrafoEstacion().obtenerEtiqueta(v)).append("  ----  ");
+                    }
+
+                    String posicionOrigen = cbxOrigen.getSelectedItem().toString();
+                    String posicionDestino = cbxDestino.getSelectedItem().toString();
+                    String mensaje = "Punto de Origen: " + posicionOrigen + "\n" + "Punto de Destino: " + posicionDestino + "\n\nEl camino corto es: \n" + caminoStr.toString();
+                    JOptionPane.showMessageDialog(null, mensaje, "Algoritmo Floyd", JOptionPane.INFORMATION_MESSAGE);
                 }
-                String posicionOrigen = cbxOrigen.getSelectedItem().toString();
-                String posicionDestino = cbxDestino.getSelectedItem().toString();
-                String mensaje = "Punto de Origen: " + posicionOrigen + "\n" + "Punto de Destino: " + posicionDestino + "\n\nEl camino corto es: \n" + caminoStr.toString();
-                JOptionPane.showMessageDialog(null, mensaje, "Algoritmo Floyd", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null,
+                        "No se puede buscar el camino mas corto con la misma adyacencia",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
             }
         } else {
             JOptionPane.showMessageDialog(null, "Grafo nulo", "Error", JOptionPane.ERROR_MESSAGE);
