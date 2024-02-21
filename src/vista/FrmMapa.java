@@ -183,6 +183,26 @@ public class FrmMapa extends javax.swing.JFrame {
         System.out.println("Tiempo de ejecucion " + metodo + ": " + timeElapsed / 1e6 + " milisegundos");
     }
 
+    private void verificarConexionGrafo() throws Exception {
+        String metodo = cbxAlgoritmoRecorrido.getSelectedItem().toString();
+
+        if (metodo.equalsIgnoreCase("Anchura")) {
+            Boolean band = ed.getGrafoEstacion().recorridoAnchura();
+            if (band == true) {
+                JOptionPane.showMessageDialog(null, "El grafo esta conectado", "Algoritmo de recorrido por Anchura", JOptionPane.INFORMATION_MESSAGE);
+            } else if (band == false) {
+                JOptionPane.showMessageDialog(null, "El grafo no esta conectado", "Algoritmo de recorrido por Anchura", JOptionPane.ERROR_MESSAGE);
+            }
+        } else if (metodo.equalsIgnoreCase("Profundidad")) {
+            Boolean band = ed.getGrafoEstacion().recorridoProfundidad();
+            if (band == true) {
+                JOptionPane.showMessageDialog(null, "El grafo esta conectado", "Algoritmo de recorrido por Profundidad", JOptionPane.INFORMATION_MESSAGE);
+            } else if (band == false) {
+                JOptionPane.showMessageDialog(null, "El grafo no esta conectado", "Algoritmo de recorrido por Profundidad", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -577,7 +597,14 @@ public class FrmMapa extends javax.swing.JFrame {
     }//GEN-LAST:event_btnConectarAleatoriamenteActionPerformed
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
-        // TODO add your handling code here:
+        try {
+            verificarConexionGrafo();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null,
+                    e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnBuscarActionPerformed
 
     /**

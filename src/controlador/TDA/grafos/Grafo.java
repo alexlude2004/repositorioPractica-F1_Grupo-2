@@ -75,32 +75,45 @@ public abstract class Grafo {
         Boolean[] visitado = new Boolean[V + 1];
         HashMap<Integer, Integer> predecesores = new HashMap<>();
 
-        for (int i = 1; i <= V; i++) {
+        int i = 1;
+        while (i <= V) {
             distancia[i] = Double.MAX_VALUE;
             visitado[i] = false;
+            i++;
         }
 
         distancia[o] = 0.0;
 
-        for (int i = 1; i <= V - 1; i++) {
+        i = 1;
+        while (i <= V - 1) {
             Double min = Double.MAX_VALUE;
             Integer min_index = -1;
 
-            for (int v = 1; v <= V; v++) {
+            int v = 1;
+            while (v <= V) {
                 if (!visitado[v] && distancia[v] <= min) {
                     min = distancia[v];
                     min_index = v;
                 }
+                v++;
             }
             visitado[min_index] = true;
 
-            for (int j = 1; j <= V; j++) {
-                if (!visitado[j] && existe_arista(min_index, j) && distancia[min_index] != Double.MAX_VALUE
-                        && distancia[min_index] + peso_arista(min_index, j) < distancia[j]) {
+            int j = 1;
+            while (j <= V) {
+                boolean nodoNoVisitado = !visitado[j];
+                boolean existeArista = existe_arista(min_index, j);
+                boolean distanciaValida = distancia[min_index] != Double.MAX_VALUE;
+                boolean esCaminoMasCorto = distancia[min_index] + peso_arista(min_index, j) < distancia[j];
+
+                if (nodoNoVisitado && existeArista && distanciaValida && esCaminoMasCorto) {
                     distancia[j] = distancia[min_index] + peso_arista(min_index, j);
                     predecesores.put(j, min_index);
                 }
+
+                j++;
             }
+            i++;
         }
 
         LinkedList<Integer> camino = new LinkedList<>();
@@ -122,8 +135,10 @@ public abstract class Grafo {
         Double[][] distancias = new Double[V + 1][V + 1];
         Integer[][] predecesores = new Integer[V + 1][V + 1];
 
-        for (int i = 1; i <= V; i++) {
-            for (int j = 1; j <= V; j++) {
+        int i = 1;
+        while (i <= V) {
+            int j = 1;
+            while (j <= V) {
                 if (i == j) {
                     distancias[i][j] = 0.0;
                 } else if (existe_arista(i, j)) {
@@ -133,33 +148,100 @@ public abstract class Grafo {
                     distancias[i][j] = Double.MAX_VALUE;
                     predecesores[i][j] = null;
                 }
+                j++;
             }
+            i++;
         }
 
-        for (int k = 1; k <= V; k++) {
-            for (int i = 1; i <= V; i++) {
-                for (int j = 1; j <= V; j++) {
-                    if (distancias[i][k] != Double.MAX_VALUE && distancias[k][j] != Double.MAX_VALUE
-                            && distancias[i][k] + distancias[k][j] < distancias[i][j]) {
+        int k = 1;
+        while (k <= V) {
+            i = 1;
+            while (i <= V) {
+                int j = 1;
+                while (j <= V) {
+                    boolean hayCaminoHastaK = distancias[i][k] != Double.MAX_VALUE;
+                    boolean hayCaminoDesdeK = distancias[k][j] != Double.MAX_VALUE;
+                    boolean esCaminoMasCorto = distancias[i][k] + distancias[k][j] < distancias[i][j];
+                    if (hayCaminoHastaK && hayCaminoDesdeK && esCaminoMasCorto) {
                         distancias[i][j] = distancias[i][k] + distancias[k][j];
                         predecesores[i][j] = predecesores[k][j];
                     }
+                    j++;
                 }
+                i++;
             }
+            k++;
         }
 
         LinkedList<Integer> camino = new LinkedList<>();
         Integer u = d;
-        while (u != o && predecesores[o][u] != null) {
+        while (u != null) {
             camino.add(u);
             u = predecesores[o][u];
         }
-        camino.add(o);
 
         sendero.put("camino", camino);
         sendero.put("distancias", distancias);
 
         return sendero;
+    }
+
+    public boolean recorridoAnchura() throws Exception {
+        int V = nro_vertices();
+        boolean[] visitados = new boolean[V + 1];
+        LinkedList<Integer> lista = new LinkedList<>();
+
+        lista.add(1);
+        visitados[1] = true;
+
+        while (!lista.isEmpty()) {
+            Integer actual = lista.deleteFirst();
+            Adyacencia[] adyacentes = adyacentes(actual).toArray();
+
+            for (Adyacencia adyacencia : adyacentes) {
+                Integer destino = adyacencia.getD();
+
+                if (!visitados[destino]) {
+                    lista.add(destino);
+                    visitados[destino] = true;
+                }
+            }
+        }
+
+        for (int i = 1; i <= V; i++) {
+            if (!visitados[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public Boolean recorridoProfundidad() throws Exception {
+        int V = nro_vertices();
+        boolean[] visitados = new boolean[V + 1];
+        LinkedList<Integer> lista = new LinkedList<>();
+
+        lista.add(1);
+
+        while (!lista.isEmpty()) {
+            Integer actual = lista.deleteFirst();
+            if (!visitados[actual]) {
+                visitados[actual] = true;
+                Adyacencia[] adyacentes = adyacentes(actual).toArray();
+
+                for (Adyacencia adyacencia : adyacentes) {
+                    Integer destino = adyacencia.getD();
+                    lista.add(destino);
+                }
+            }
+        }
+
+        for (int i = 1; i <= V; i++) {
+            if (!visitados[i]) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }
